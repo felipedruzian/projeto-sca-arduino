@@ -8,28 +8,31 @@ bool estadoLed = 0;
 
 void setup()
 {
-    pinMode(Rele, OUTPUT);
-    pinMode(Botao1, INPUT_PULLUP);
-    pinMode(LED_BUILTIN, OUTPUT);
-    Serial.begin(9600);
+    pinMode(Rele, OUTPUT); //define o pino do Rele e do Led como OUTPUT (Saida de dados)
+    pinMode(LED_BUILTIN, OUTPUT); 
+
+    pinMode(Botao1, INPUT_PULLUP); //define o pino do Botao como INPUT (Entrada de dados)
+
+    Serial.begin(9600); //inicializa comunicação serial
+
     digitalWrite(Rele, HIGH); //inicializa com o rele desligado
 }
 
 void loop()
 {
     if (digitalRead(Botao1) != 0) {
-        while (digitalRead(Botao1) != 0) {
+        while (digitalRead(Botao1) != 0) { //while pra nao loopar infinitamente
             delay(100); }
 
-        estadoRele = !estadoRele;
+        estadoRele = !estadoRele; //inverte os estados do Rele/Led
         estadoLed = !estadoLed;
 
-        Serial.print("Estado do Rele: ");
+        Serial.print("Estado do Rele: "); //printa no monitor serial o estado do Rele/Led
         Serial.println(estadoRele);
         Serial.print("Estado do Led: ");
         Serial.println(estadoLed);
 
-        digitalWrite(Rele, estadoRele);
+        digitalWrite(Rele, estadoRele); //muda o estado do Rele/Led
         digitalWrite(LED_BUILTIN, estadoLed);
     }
 }
