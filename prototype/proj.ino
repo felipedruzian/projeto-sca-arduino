@@ -1,11 +1,11 @@
 #include <LiquidCrystal.h>
 #include <RTClib.h>
 
-LiquidCrystal lcd(7, 6, 5, 4, 3, 2); //pinos RS, E, D4, D5, D6, D7
+LiquidCrystal lcd(9, 8, 7, 6, 5, 4); //pinos RS, E, D4, D5, D6, D7
 RTC_DS3231 rtc;
 
-#define Rele 9
-#define Botao1 8
+#define Rele 12
+#define Botao1 11
 //#define Vazao 10
 
 char daysOfTheWeek[7][12] = {"Domingo", "Segunda", "Terça", "Quarta", "Quinta", "Sexta", "Sábado"};
