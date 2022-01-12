@@ -6,7 +6,12 @@ RTC_DS3231 rtc;
 
 #define Rele 12
 #define Botao1 11
-//#define Vazao 10
+
+#define Vazao 2
+double fluxo = 0;
+double volume = 0;
+double volumeTotal = 0;
+volatile int contador;
 
 char daysOfTheWeek[7][12] = {"Domingo", "Segunda", "Terça", "Quarta", "Quinta", "Sexta", "Sábado"};
 bool estadoRele = 1; //  1 = desligado / 0 = ligado  (negocio sem nexo da p***)
@@ -14,9 +19,9 @@ bool estadoLed = 0;
 
 void setup()
 {
-    pinMode(Rele, OUTPUT); //define o pino do Rele e do Led como OUTPUT (Saida de dados)
     pinMode(LED_BUILTIN, OUTPUT); 
-
+    pinMode(Rele, OUTPUT); //define o pino do Rele e do Led como OUTPUT (Saida de dados)
+    digitalWrite(Rele, HIGH); //inicializa com o rele desligado
     pinMode(Botao1, INPUT_PULLUP); //define o pino do Botao como INPUT (Entrada de dados)
 
     Serial.begin(9600); //inicializa comunicação serial
@@ -28,14 +33,15 @@ void setup()
         while (1) delay(10); //loop para o programa se manter aqui caso de o erro
     }
     
-
     if (rtc.lostPower()) //usado apenas pra configurar o horario
     {
         rtc.adjust(DateTime(F(__DATE__), F(__TIME__))); //Configura o relogio pra hora que o sketch foi compilado
     }
     
 
-    digitalWrite(Rele, HIGH); //inicializa com o rele desligado
+    pinMode(Vazao, INPUT_PULLUP);
+    attachInterrupt(digitalPinToInterrupt(2), contadorPulso, RISING);
+
 }
 
 void loop()
@@ -60,7 +66,7 @@ void loop()
     lcd.print(now.minute(), DEC);
     lcd.print(":");
     lcd.print(now.second(), DEC);
-    
+
     if (digitalRead(Botao1) != 1) {
         delay(400);
 
@@ -75,7 +81,34 @@ void loop()
         } else {
             lcd.print("OFF");
         }
+
+        //fluxo = contador * 2.25;
+        //fluxo *= 60;
+        //fluxo /= 1000;
+
+        //volume = fluxo / 60;
+        //volumeTotal += volume;
     } 
     digitalWrite(Rele, estadoRele); //muda o estado do Rele/Led
     digitalWrite(LED_BUILTIN, estadoLed);
+    if (estadoRele == 0)
+    {
+        contador = 0;
+
+        interrupts();
+        delay(2000); //delay n funciona no interrupt, estudar millis!
+        noInterrupts();
+
+        lcd.clear();
+        lcd.setCursor(0,0);
+        lcd.print("Volume: ");
+        lcd.print(contador);
+        lcd.print(" L");
+        estadoRele = !estadoRele;
+        digitalWrite(Rele, estadoRele);
+    }
+}
+
+void contadorPulso() { //funcao ta ok
+    contador++;
 }
