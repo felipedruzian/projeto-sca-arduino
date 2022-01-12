@@ -13,6 +13,10 @@ double volume = 0;
 double volumeTotal = 0;
 volatile int contador;
 
+unsigned long tempoIni = 0;
+unsigned long tempoAtu;
+const unsigned long periodo = 500;
+
 char daysOfTheWeek[7][12] = {"Domingo", "Segunda", "Terça", "Quarta", "Quinta", "Sexta", "Sábado"};
 bool estadoRele = 1; //  1 = desligado / 0 = ligado  (negocio sem nexo da p***)
 bool estadoLed = 0;
@@ -48,6 +52,7 @@ void loop()
 {
     DateTime now = rtc.now(); //cria uma variavel do tipo DateTime (data) que vai receber a data/horario do momento
     
+    Serial.println("xesque");
     lcd.setCursor(0,0);         //prints no display
     lcd.print("Estado Rele: ");
     if (estadoRele == 0)
@@ -81,6 +86,9 @@ void loop()
         } else {
             lcd.print("OFF");
         }
+        digitalWrite(Rele, estadoRele); //muda o estado do Rele/Led
+        digitalWrite(LED_BUILTIN, estadoLed);
+    } 
 
         //fluxo = contador * 2.25;
         //fluxo *= 60;
@@ -88,24 +96,34 @@ void loop()
 
         //volume = fluxo / 60;
         //volumeTotal += volume;
-    } 
-    digitalWrite(Rele, estadoRele); //muda o estado do Rele/Led
-    digitalWrite(LED_BUILTIN, estadoLed);
-    if (estadoRele == 0)
+
+
+    while (estadoRele == 0)
     {
-        contador = 0;
+        //tempoIni = millis();
+        if (millis() - tempoIni >= periodo) 
+        {
+            tempoIni += periodo;
+            noInterrupts();
 
-        interrupts();
-        delay(2000); //delay n funciona no interrupt, estudar millis!
-        noInterrupts();
 
-        lcd.clear();
-        lcd.setCursor(0,0);
-        lcd.print("Volume: ");
-        lcd.print(contador);
-        lcd.print(" L");
-        estadoRele = !estadoRele;
-        digitalWrite(Rele, estadoRele);
+            fluxo = contador;
+            contador = 0;
+            interrupts();
+            
+            lcd.setCursor(0,0);
+            lcd.clear();
+            lcd.print("Volume: ");
+            lcd.print(fluxo);
+            lcd.print(" L");
+            Serial.println("morri xc");
+            
+        }
+        if (digitalRead(Botao1) != 1) {
+            delay(400);
+            estadoRele = !estadoRele;
+            digitalWrite(Rele, estadoRele);
+        }
     }
 }
 
