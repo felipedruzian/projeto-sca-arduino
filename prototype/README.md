@@ -23,6 +23,7 @@ Mais informções sobre a montagem em <a href="https://raw.githubusercontent.com
 
 + Protótipo 0.5 (Finalizado)
     + Adicionado a funcionalidade de "alarme" do RTC para ele ligar a valvula sozinho no horario definido+
+    + <a href="https://youtu.be/oR9g_SLRXh8">Vídeo</a>
 + Protótipo 0.45
     + Adicionado a função de fechar a valvula solenoide depois de X quantidade de agua
 + Protótipo 0.4
